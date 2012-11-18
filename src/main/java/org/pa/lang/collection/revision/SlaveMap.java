@@ -1,4 +1,4 @@
-package org.pa.lang.collection;
+package org.pa.lang.collection.revision;
 
 import java.util.Map;
 
