@@ -6,4 +6,8 @@ public interface RevisionControlSlave {
 
 	public long getRevisionNumber();
 
+	public void setAutoUpdateEnabled(boolean enabled);
+	
+	public boolean isAutoUpdateEnabled();
+
 }
