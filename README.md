@@ -1,6 +1,6 @@
 # Projekt Angriff Lang
 
-This is just another incoherent library of utility and collection classes for Java.
+This is just another library of utility and collection classes for Java.
 
 ## Content
 
