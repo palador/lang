@@ -4,10 +4,10 @@ public interface RevisionControlSlave {
 
 	public RevisonControlMaster getMaster();
 
-	public long getRevisionNumber();
-
 	public void setAutoUpdateEnabled(boolean enabled);
 	
 	public boolean isAutoUpdateEnabled();
+
+	public boolean update();
 
 }

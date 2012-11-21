@@ -4,6 +4,4 @@ public interface RevisonControlMaster {
 
 	public RevisionControlSlave createSlave();
 
-	public long getRevisionNumber();
-
 }
