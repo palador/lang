@@ -5,6 +5,6 @@ import java.util.List;
 public interface MasterSet<E> extends List<E>, MasterCollection<E> {
 
 	@Override
-	public SlaveSet<E> createSlave();
+	public SlaveSet<E> createSlave() throws RuntimeException;
 
 }

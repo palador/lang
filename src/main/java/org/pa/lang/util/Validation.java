@@ -19,7 +19,7 @@ public final class Validation {
 
 	public static <E> E notNull(E value, String name)
 			throws IllegalArgumentException {
-		return notNull(value, null, name);
+		return notNull(value, "%s must not be null", name);
 	}
 
 	public static <E extends CharSequence> E notEmpty(E value,

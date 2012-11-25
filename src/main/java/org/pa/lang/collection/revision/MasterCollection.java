@@ -6,6 +6,6 @@ public interface MasterCollection<E> extends RevisonControlMaster,
 		Collection<E> {
 
 	@Override
-	public SlaveCollection<E> createSlave();
+	public SlaveCollection<E> createSlave() throws RuntimeException;
 
 }

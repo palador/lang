@@ -1,47 +1,29 @@
 package org.pa.lang.collection.revision;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public final class RevisionCollectionFactory<E, V> {
+public final class RevisionCollectionFactory {
 
-	public RevisionCollectionFactory(Class<E> entryType)
-			throws IllegalArgumentException {
+	public CollectionType getCollectionType() {
+		return CollectionType.LIST;
 	}
 
-	public RevisionCollectionFactory(Class<E> keyType, Class<V> valueType)
-			throws IllegalArgumentException {
+	protected Object createInnerMasterCollection() {
+		return new ArrayList<Object>();
 	}
 
-	public RevisionCollectionFactory<E, V> setMasterType(Class<?> type)
-			throws IllegalArgumentException {
-		return this;
+	@SuppressWarnings("unchecked")
+	protected Object createInnerSlaveCollection(Object innerMasterCollection) {
+		return new ArrayList<Object>((List<Object>) innerMasterCollection);
 	}
-
-	public RevisionCollectionFactory<E, V> setSlaveType(Class<?> type)
-			throws IllegalArgumentException {
-		return this;
-	}
-
-	public RevisionCollectionFactory<E, V> setComparator(
-			Comparator<E> comparator) {
-		return this;
-	}
-
-	public MasterCollection<E> createMasterCollection() {
-		return null;
-	}
-
-	public MasterList<E> createMasterList() throws IllegalStateException {
-		return null;
-	}
-
-	public MasterSet<E> createMasterSet() throws IllegalStateException {
-		return null;
-	}
-
-	public MasterMap<E, V> createMasterMap() throws IllegalStateException {
-		return null;
+	
+	@SuppressWarnings("unchecked")
+	protected RevisionControlSlave createSlave(Object innserSlaveCollection,
+			Revision<Object> latestRevision) {
+		return new SlaveList<Object>((List<Object>) innserSlaveCollection,
+				latestRevision);
 	}
 
 }

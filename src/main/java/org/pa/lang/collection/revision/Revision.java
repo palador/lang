@@ -13,7 +13,7 @@ public final class Revision<E> {
 
 	public Revision(ModificationOperation modOp, int index, E value) {
 		this.modOp = notNull(modOp, "modOp");
-		this.value = notNull(value, "value");
+		this.value = value;
 		this.index = index;
 	}
 
@@ -21,8 +21,9 @@ public final class Revision<E> {
 		return next;
 	}
 
-	public void setNext(Revision<E> next) {
+	public Revision<E> setNext(Revision<E> next) {
 		this.next = next;
+		return next;
 	}
 
 	public ModificationOperation getModOp() {
