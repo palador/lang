@@ -4,14 +4,17 @@ import static org.pa.lang.util.Validation.isTrue;
 import static org.pa.lang.util.Validation.notNull;
 
 import java.util.Collection;
+import java.util.List;
+
+import org.pa.lang.revision.AbstractRevision;
+import org.pa.lang.revision.NullRevision;
 
 public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
-		implements
-		MasterCollection<E> {
+		implements MasterCollection<E> {
 
 	protected final RevisionCollectionFactory factory;
 	protected final CT innerCollection;
-	protected Revision<E> currentRevision;
+	private AbstractRevision<CT> currentRevision;
 
 	@SuppressWarnings("unchecked")
 	AbstractMasterCollection(RevisionCollectionFactory factory)
@@ -24,14 +27,22 @@ public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
 				factory.getCollectionType());
 		this.innerCollection = (CT) factory.createInnerMasterCollection();
 
-		currentRevision = new Revision<E>(ModificationOperation.INIT, -1, null);
+		currentRevision = new NullRevision<CT>();
 	}
 
-	protected void newRevision(ModificationOperation modOp, int index, E value)
-			throws IllegalArgumentException {
-		currentRevision = currentRevision.setNext(new Revision<E>(modOp, index,
-				value));
+	protected void newRevision(AbstractRevision<CT> revision) {
+		// TODO nullcheck
+		currentRevision = currentRevision.setNext(revision);
 	}
+
+	//
+	//
+	//
+	// TODO simplify factory: only one type
+	// TODO add transactions
+	//
+	//
+	//
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -43,8 +54,8 @@ public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
 
 			// init slave with current revision
 			SlaveCollection<E> result = (SlaveCollection<E>) factory
-					.createSlave(
-					innerSlaveCollection, (Revision<Object>) currentRevision);
+					.createSlave(innerSlaveCollection,
+							(AbstractRevision<List<Object>>) currentRevision);
 
 			return result;
 		} catch (Exception e) {
@@ -55,7 +66,7 @@ public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
 	public boolean add(E e) {
 		boolean hasChanged = innerCollection.add(e);
 		if (hasChanged) {
-			newRevision(ModificationOperation.ADD, -1, e);
+			newRevision(new AddRevision(e));
 		}
 		return hasChanged;
 	}
@@ -71,15 +82,14 @@ public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
 	public void clear() {
 		if (!innerCollection.isEmpty()) {
 			innerCollection.clear();
-			newRevision(ModificationOperation.CLEAR, -1, null);
+			newRevision(new ClearRevision());
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean remove(Object o) {
 		boolean hasChanged = innerCollection.remove(o);
 		if (hasChanged) {
-			newRevision(ModificationOperation.REMOVE, -1, (E) o);
+			newRevision(new RemoveRevision(o));
 		}
 		return hasChanged;
 	}
@@ -132,6 +142,39 @@ public abstract class AbstractMasterCollection<E, CT extends Collection<E>>
 
 	public <T> T[] toArray(T[] a) {
 		return innerCollection.toArray(a);
+	}
+
+	protected final class AddRevision extends AbstractRevision<CT> {
+		private final E item;
+
+		protected AddRevision(E item) {
+			this.item = item;
+		}
+
+		@Override
+		public void apply(CT target) {
+			target.add(item);
+		}
+	}
+
+	protected final class RemoveRevision extends AbstractRevision<CT> {
+		private final Object item;
+
+		protected RemoveRevision(Object item) {
+			this.item = item;
+		}
+
+		@Override
+		public void apply(CT target) {
+			target.remove(item);
+		}
+	}
+
+	protected final class ClearRevision extends AbstractRevision<CT> {
+		@Override
+		public void apply(CT target) {
+			target.clear();
+		}
 	}
 
 }

@@ -6,22 +6,22 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.pa.lang.collection.UnmodifiableIterator;
+import org.pa.lang.revision.AbstractRevision;
 
 public abstract class AbstractSlaveCollection<E, IC extends Collection<E>>
 		implements SlaveCollection<E> {
 
 	protected final IC innerCollection;
-	protected Revision<E> currentRevision;
+	protected AbstractRevision<IC> currentRevision;
 
 	private boolean isAutoUpdateEnabled = true;
 
-	AbstractSlaveCollection(IC innerCollection, Revision<E> initialRevision)
+	AbstractSlaveCollection(IC innerCollection,
+			AbstractRevision<IC> initialRevision)
 			throws IllegalArgumentException {
 		this.innerCollection = notNull(innerCollection, "innerCollection");
 		this.currentRevision = notNull(initialRevision, "currentRevision");
 	}
-
-	abstract protected void applyRevision(Revision<E> revision);
 
 	protected boolean autoUpdate() {
 		return isAutoUpdateEnabled && update();
@@ -40,9 +40,9 @@ public abstract class AbstractSlaveCollection<E, IC extends Collection<E>>
 	@Override
 	public boolean update() {
 		boolean result = false;
-		Revision<E> nextRev = currentRevision;
+		AbstractRevision<IC> nextRev = currentRevision;
 		while ((nextRev = nextRev.getNext()) != null) {
-			applyRevision(nextRev);
+			nextRev.apply(innerCollection);
 			currentRevision = nextRev;
 			result = true;
 		}

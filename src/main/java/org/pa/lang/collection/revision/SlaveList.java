@@ -5,19 +5,14 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.pa.lang.collection.UnmodifiableListIterator;
+import org.pa.lang.revision.AbstractRevision;
 
 public class SlaveList<E> extends AbstractSlaveCollection<E, List<E>> implements
 		List<E> {
 
-	SlaveList(List<E> innerCollection, Revision<E> initialRevision)
+	SlaveList(List<E> innerCollection, AbstractRevision<List<E>> initialRevision)
 			throws IllegalArgumentException {
 		super(innerCollection, initialRevision);
-	}
-
-	@Override
-	protected void applyRevision(Revision<E> revision) {
-		revision.getModOp().applyToList(innerCollection, revision.getIndex(),
-				revision.getValue());
 	}
 
 	@Override

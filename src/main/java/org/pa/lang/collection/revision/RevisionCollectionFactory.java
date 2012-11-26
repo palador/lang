@@ -3,6 +3,8 @@ package org.pa.lang.collection.revision;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pa.lang.revision.AbstractRevision;
+
 
 public final class RevisionCollectionFactory {
 
@@ -21,7 +23,7 @@ public final class RevisionCollectionFactory {
 	
 	@SuppressWarnings("unchecked")
 	protected RevisionControlSlave createSlave(Object innserSlaveCollection,
-			Revision<Object> latestRevision) {
+			AbstractRevision<List<Object>> latestRevision) {
 		return new SlaveList<Object>((List<Object>) innserSlaveCollection,
 				latestRevision);
 	}

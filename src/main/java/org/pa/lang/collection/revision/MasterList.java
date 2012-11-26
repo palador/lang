@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.pa.lang.revision.AbstractRevision;
 import org.pa.lang.util.Validation;
 
 public class MasterList<E> extends AbstractMasterCollection<E, List<E>>
@@ -25,7 +26,7 @@ public class MasterList<E> extends AbstractMasterCollection<E, List<E>>
 	@Override
 	public void add(int index, E element) {
 		innerCollection.add(index, element);
-		newRevision(ModificationOperation.ADD_AT_INDEX, index, element);
+		newRevision(new AddAtIndexRevision(element, index));
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class MasterList<E> extends AbstractMasterCollection<E, List<E>>
 		while (iter.hasNext()) {
 			E next = iter.next();
 			innerCollection.add(index, next);
-			newRevision(ModificationOperation.ADD_AT_INDEX, index, next);
+			newRevision(new AddAtIndexRevision(next, index));
 			index++;
 		}
 		return result;
@@ -44,17 +45,16 @@ public class MasterList<E> extends AbstractMasterCollection<E, List<E>>
 	@Override
 	public E remove(int index) {
 		E result = innerCollection.remove(index);
-		newRevision(ModificationOperation.REMOVE_AT_INDEX, index, null);
+		newRevision(new RemoveAtIndexRevision(index));
 		return result;
 	}
 
 	@Override
 	public E set(int index, E element) {
 		E result = innerCollection.set(index, element);
-		newRevision(ModificationOperation.SET_AT_INDEX, index, element);
+		newRevision(new SetAtIndexRevision(element, index));
 		return result;
 	}
-
 
 	@Override
 	public Iterator<E> iterator() {
@@ -89,6 +89,50 @@ public class MasterList<E> extends AbstractMasterCollection<E, List<E>>
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
 		return innerCollection.subList(fromIndex, toIndex);
+	}
+
+	protected final class AddAtIndexRevision extends AbstractRevision<List<E>> {
+		private final E item;
+		private final int index;
+
+		protected AddAtIndexRevision(E item, int index) {
+			this.item = item;
+			this.index = index;
+		}
+
+		@Override
+		public void apply(List<E> target) {
+			target.add(index, item);
+		}
+	}
+
+	protected final class RemoveAtIndexRevision extends
+			AbstractRevision<List<E>> {
+		private final int index;
+
+		protected RemoveAtIndexRevision(int index) {
+			this.index = index;
+		}
+
+		@Override
+		public void apply(List<E> target) {
+			target.remove(index);
+		}
+	}
+
+	protected final class SetAtIndexRevision extends AbstractRevision<List<E>> {
+		private final E item;
+		private final int index;
+
+		protected SetAtIndexRevision(E item, int index) {
+			this.item = item;
+			this.index = index;
+		}
+
+		@Override
+		public void apply(List<E> target) {
+			target.set(index, item);
+		}
 	}
 
 }
